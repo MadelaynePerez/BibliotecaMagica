@@ -8,15 +8,15 @@ package com.mycompany.bibliotecamagica.Arboles;
  *
  * @author Ana
  */
-
 import java.util.ArrayList;
 
 public class ArbolB {
 
-    private static final int T = 3; 
+    private static final int T = 3;
     private NodoB raiz;
 
-    static class NodoB {
+    public static class NodoB {
+
         ArrayList<Libro> libros;
         ArrayList<NodoB> hijos;
         boolean hoja;
@@ -25,6 +25,18 @@ public class ArbolB {
             this.hoja = hoja;
             this.libros = new ArrayList<>();
             this.hijos = new ArrayList<>();
+        }
+
+        public java.util.ArrayList<Libro> getLibros() {
+            return libros;
+        }
+
+        public java.util.ArrayList<NodoB> getHijos() {
+            return hijos;
+        }
+
+        public boolean isHoja() {
+            return hoja;
         }
     }
 
@@ -44,7 +56,9 @@ public class ArbolB {
                 dividirHijo(nuevaRaiz, 0, raiz);
 
                 int i = 0;
-                if (libro.getAnio() > nuevaRaiz.libros.get(0).getAnio()) i++;
+                if (libro.getAnio() > nuevaRaiz.libros.get(0).getAnio()) {
+                    i++;
+                }
                 insertarNoLleno(nuevaRaiz.hijos.get(i), libro);
 
                 raiz = nuevaRaiz;
@@ -65,13 +79,16 @@ public class ArbolB {
             }
             nodo.libros.set(i + 1, libro);
         } else {
-            while (i >= 0 && libro.getAnio() < nodo.libros.get(i).getAnio())
+            while (i >= 0 && libro.getAnio() < nodo.libros.get(i).getAnio()) {
                 i--;
+            }
 
             i++;
             if (nodo.hijos.get(i).libros.size() == 2 * T - 1) {
                 dividirHijo(nodo, i, nodo.hijos.get(i));
-                if (libro.getAnio() > nodo.libros.get(i).getAnio()) i++;
+                if (libro.getAnio() > nodo.libros.get(i).getAnio()) {
+                    i++;
+                }
             }
             insertarNoLleno(nodo.hijos.get(i), libro);
         }
@@ -80,41 +97,52 @@ public class ArbolB {
     private void dividirHijo(NodoB padre, int i, NodoB hijo) {
         NodoB nuevo = new NodoB(hijo.hoja);
 
-        for (int j = 0; j < T - 1; j++)
+        for (int j = 0; j < T - 1; j++) {
             nuevo.libros.add(hijo.libros.get(j + T));
+        }
 
-        if (!hijo.hoja)
-            for (int j = 0; j < T; j++)
+        if (!hijo.hoja) {
+            for (int j = 0; j < T; j++) {
                 nuevo.hijos.add(hijo.hijos.get(j + T));
+            }
+        }
 
-        for (int j = hijo.libros.size() - 1; j >= T - 1; j--)
+        for (int j = hijo.libros.size() - 1; j >= T - 1; j--) {
             hijo.libros.remove(j);
+        }
 
-        if (!hijo.hoja)
-            for (int j = hijo.hijos.size() - 1; j >= T; j--)
+        if (!hijo.hoja) {
+            for (int j = hijo.hijos.size() - 1; j >= T; j--) {
                 hijo.hijos.remove(j);
+            }
+        }
 
         padre.hijos.add(i + 1, nuevo);
         padre.libros.add(i, hijo.libros.get(T - 1));
     }
 
     // - Busqeda
-
     public Libro buscarPorAnio(int anio) {
         return buscarPorAnio(raiz, anio);
     }
 
     private Libro buscarPorAnio(NodoB nodo, int anio) {
-        if (nodo == null) return null;
+        if (nodo == null) {
+            return null;
+        }
 
         int i = 0;
-        while (i < nodo.libros.size() && anio > nodo.libros.get(i).getAnio())
+        while (i < nodo.libros.size() && anio > nodo.libros.get(i).getAnio()) {
             i++;
+        }
 
-        if (i < nodo.libros.size() && nodo.libros.get(i).getAnio() == anio)
+        if (i < nodo.libros.size() && nodo.libros.get(i).getAnio() == anio) {
             return nodo.libros.get(i);
+        }
 
-        if (nodo.hoja) return null;
+        if (nodo.hoja) {
+            return null;
+        }
 
         return buscarPorAnio(nodo.hijos.get(i), anio);
     }
@@ -124,19 +152,24 @@ public class ArbolB {
     }
 
     private void buscarPorRango(NodoB nodo, int desde, int hasta) {
-        if (nodo == null) return;
-
-        for (int i = 0; i < nodo.libros.size(); i++) {
-            if (!nodo.hoja)
-                buscarPorRango(nodo.hijos.get(i), desde, hasta);
-
-            int anio = nodo.libros.get(i).getAnio();
-            if (anio >= desde && anio <= hasta)
-                System.out.println(nodo.libros.get(i).getTitulo() + " (" + anio + ")");
+        if (nodo == null) {
+            return;
         }
 
-        if (!nodo.hoja)
+        for (int i = 0; i < nodo.libros.size(); i++) {
+            if (!nodo.hoja) {
+                buscarPorRango(nodo.hijos.get(i), desde, hasta);
+            }
+
+            int anio = nodo.libros.get(i).getAnio();
+            if (anio >= desde && anio <= hasta) {
+                System.out.println(nodo.libros.get(i).getTitulo() + " (" + anio + ")");
+            }
+        }
+
+        if (!nodo.hoja) {
             buscarPorRango(nodo.hijos.get(nodo.hijos.size() - 1), desde, hasta);
+        }
     }
 
     // msosrar
@@ -145,14 +178,23 @@ public class ArbolB {
     }
 
     private void mostrar(NodoB nodo, int nivel) {
-        if (nodo == null) return;
-        for (int i = 0; i < nodo.libros.size(); i++) {
-            if (!nodo.hoja) mostrar(nodo.hijos.get(i), nivel + 1);
-            System.out.println("   ".repeat(nivel) +
-                    nodo.libros.get(i).getTitulo() +
-                    " (" + nodo.libros.get(i).getAnio() + ")");
+        if (nodo == null) {
+            return;
         }
-        if (!nodo.hoja)
+        for (int i = 0; i < nodo.libros.size(); i++) {
+            if (!nodo.hoja) {
+                mostrar(nodo.hijos.get(i), nivel + 1);
+            }
+            System.out.println("   ".repeat(nivel)
+                    + nodo.libros.get(i).getTitulo()
+                    + " (" + nodo.libros.get(i).getAnio() + ")");
+        }
+        if (!nodo.hoja) {
             mostrar(nodo.hijos.get(nodo.hijos.size() - 1), nivel + 1);
+        }
+    }
+
+    public NodoB getRaiz() {
+        return raiz;
     }
 }

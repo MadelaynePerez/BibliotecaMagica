@@ -12,7 +12,8 @@ import com.mycompany.bibliotecamagica.EstructurasBasicas.Cola;
 import com.mycompany.bibliotecamagica.EstructurasBasicas.Grafo;
 import com.mycompany.bibliotecamagica.EstructurasBasicas.Nodo;
 import com.mycompany.bibliotecamagica.EstructurasBasicas.Pila;
-import com.mycompany.bibliotecamagica.EstructurasBasicas.TablaHash;
+import com.mycompany.bibliotecamagica.EstructurasBasicas.HashTableISBN;
+import com.mycompany.bibliotecamagica.Vistas.Graficador.Graficador;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,79 +28,76 @@ public class BibliotecaMagica {
     public static void main(String[] args) {
         System.out.println("Hello World!");
 
+        System.out.println("🧩 INICIANDO PRUEBAS DE VISUALIZACIÓN...\n");
+
+        // === 1️⃣ AVL ===
+        Avl avl = new Avl();
+        avl.insertar(new Libro("978-01", "Cien Años", "Realismo", 1985, "Gabo"));
+        avl.insertar(new Libro("978-02", "Rayuela", "Surrealismo", 1963, "Cortázar"));
+        avl.insertar(new Libro("978-03", "El Quijote", "Clásico", 1605, "Cervantes"));
+        avl.insertar(new Libro("978-04", "La Odisea", "Épico", -800, "Homero"));
+        avl.insertar(new Libro("978-05", "Ficciones", "Fantasía", 1944, "Borges"));
+        System.out.println("✅ AVL generado.");
+        Graficador.graficarAVL(avl);
+
+        // === 2️⃣ Árbol B ===
+        ArbolB arbolB = new ArbolB();
+        arbolB.insertar(new Libro("978-06", "Alicia", "Infantil", 1865, "Carroll"));
+        arbolB.insertar(new Libro("978-07", "Ulises", "Moderno", 1922, "Joyce"));
+        arbolB.insertar(new Libro("978-08", "Hamlet", "Drama", 1603, "Shakespeare"));
+        arbolB.insertar(new Libro("978-09", "Crimen", "Drama", 1866, "Dostoievski"));
+        arbolB.insertar(new Libro("978-10", "Divina Comedia", "Épico", 1320, "Dante"));
+        System.out.println("✅ Árbol B generado.");
+        Graficador.graficarArbolB(arbolB);
+
+        // === 3️⃣ Árbol B+ ===
+        ArbolBMas arbolBMas = new ArbolBMas();
+        arbolBMas.insertar(new Libro("It", "Stephen King", "978-01", 1986, "Terror"));
+        arbolBMas.insertar(new Libro("Sandman", "Neil Gaiman", "978-02", 1989, "Fantasía"));
+        arbolBMas.insertar(new Libro("Cementerio de animales", "Stephen King", "978-03", 1983, "Terror"));
+        arbolBMas.insertar(new Libro("Coraline", "Neil Gaiman", "978-04", 2002, "Infantil"));
+        arbolBMas.insertar(new Libro("Good Omens", "Gaiman y Pratchett", "978-05", 1990, "Comedia"));
+        arbolBMas.insertar(new Libro("Carrie", "Stephen King", "978-06", 1974, "Horror"));
+        arbolBMas.insertar(new Libro("American Gods", "Neil Gaiman", "978-07", 2001, "Mitología"));
+        arbolBMas.insertar(new Libro("El Resplandor", "Stephen King", "978-08", 1977, "Psicológico"));
+        arbolBMas.graficar("ArbolBMas");
+
+        // === 4️⃣ Tabla Hash ===
+        HashTableISBN hash = new HashTableISBN(10);
+        hash.insertar(new Libro("111-A", "Matemáticas", "Educativo", 2010, "Smith"));
+        hash.insertar(new Libro("222-B", "Programación", "Tecnología", 2018, "Ana Pérez"));
+        hash.insertar(new Libro("333-C", "Historia", "Social", 2005, "Carlos R."));
+        hash.insertar(new Libro("444-D", "Química", "Ciencia", 2015, "Lopez"));
+        System.out.println("✅ Tabla Hash generada.");
+        Graficador.graficarHash(hash);
+
+        // === 5️⃣ Grafo (Red de Bibliotecas) ===
         Grafo grafo = new Grafo();
-        CargaArchivo carga = new CargaArchivo();
-        List<String> errores = new ArrayList<>();
+        grafo.agregarConexion("Biblioteca Central", "Biblioteca Zona 1", 10, 5, true);
+        grafo.agregarConexion("Biblioteca Central", "Biblioteca Norte", 20, 10, true);
+        grafo.agregarConexion("Biblioteca Zona 1", "Biblioteca Sur", 15, 8, true);
+        grafo.agregarConexion("Biblioteca Norte", "Biblioteca Sur", 25, 12, true);
+        System.out.println("✅ Red de bibliotecas generada.");
+        Graficador.graficarRed(grafo);
 
-        // === RUTAS DE ARCHIVOS ===
-        String rutaBibliotecas = "C:\\Users\\Ana\\Desktop\\Bibliotecas.csv";
-        String rutaLibros = "C:\\Users\\Ana\\Desktop\\Libro.csv";
-        String rutaConexiones = "C:\\Users\\Ana\\Desktop\\coneciones.csv";
+        // === 6️⃣ Colas ===
+        Biblioteca biblio = new Biblioteca(
+                "Biblioteca Central",
+                "Zona 1, Quetzaltenango",
+                "Ana Pérez",
+                1,
+                200,
+                1
+        );
+        biblio.getColaIngreso().agregarCola(101);
+        biblio.getColaIngreso().agregarCola(102);
+        biblio.getColaTraspaso().agregarCola(201);
+        biblio.getColaSalida().agregarCola(301);
+        biblio.getColaSalida().agregarCola(302);
+        System.out.println("✅ Colas generadas.");
+        Graficador.graficarColas(biblio);
 
-        // === CARGA DE DATOS ===
-        List<Biblioteca> bibliotecas = carga.cargarBibliotecas(rutaBibliotecas, grafo, errores);
-        Map<String, Biblioteca> mapaPorId = new HashMap<>();
-        for (Biblioteca b : bibliotecas) {
-            mapaPorId.put(b.getId(), b);
-        }
-
-        carga.cargarLibros(rutaLibros, mapaPorId, errores);
-        carga.cargarConexiones(rutaConexiones, grafo, errores);
-
-        if (!errores.isEmpty()) {
-            System.out.println("=== ERRORES DETECTADOS ===");
-            errores.forEach(System.out::println);
-        }
-
-        System.out.println("\n=== BIBLIOTECAS CARGADAS ===");
-        for (Biblioteca b : bibliotecas) {
-            System.out.println(b.resumen());
-        }
-
-        // === PRUEBA MANUAL ===
-        Biblioteca b1 = bibliotecas.get(0);
-        System.out.println("\nInsertando libro manualmente en " + b1.getNombre());
-        Libro nuevo = new Libro("Harry Potter", "J.K. Rowling", "978-84-376-0494-7", 1997, "Fantasía");
-        b1.insertarLibro(nuevo);
-
-        System.out.println("\n=== AVL de " + b1.getNombre() + " ===");
-        b1.mostrarLibrosAVL();
-
-        // === BUSCAR POR TÍTULO ===
-        System.out.println("\nBuscando 'Harry Potter' en AVL...");
-        Libro encontrado = b1.getArbolLibros().buscar("Harry Potter");
-        if (encontrado != null) {
-            System.out.println("Libro encontrado: " + encontrado);
-        } else {
-            System.out.println("Libro no encontrado.");
-        }
-
-        // === ELIMINAR Y BUSCAR NUEVAMENTE ===
-        System.out.println("\nEliminando 'Harry Potter' del árbol...");
-        // Si tienes implementado el eliminar, llámalo aquí.
-         b1.getArbolLibros().eliminar("Harry Potter");
-
-        System.out.println("\nBuscando nuevamente 'Harry Potter'...");
-        encontrado = b1.getArbolLibros().buscar("Harry Potter");
-        if (encontrado != null) {
-            System.out.println("Libro encontrado: " + encontrado);
-        } else {
-            System.out.println("Libro no encontrado (correcto).");
-        }
-
-       
-        //System.out.println("\n=== GRAFO DE BIBLIOTECAS ===");
-        //grafo.mostrarGrafo();
-
-        // === PRUEBA DE COLAS Y PILAS ===
-        b1.agregarLibroACola(1);
-        b1.agregarLibroACola(2);
-        b1.mostrarCola();
-
-        b1.despacharLibro(100);
-        b1.despacharLibro(200);
-        b1.mostrarPila();
-
-        System.out.println("\n===== PRUEBA FINALIZADA =====");
+        System.out.println("\n🎉 TODAS LAS VISUALIZACIONES GENERADAS EXITOSAMENTE 🎨");
     }
+
 }

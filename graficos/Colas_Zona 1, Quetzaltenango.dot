@@ -1,0 +1,13 @@
+digraph Colas {
+rankdir=LR;
+node [shape=box, style=filled, color=lightgrey];
+subgraph cluster_Ingreso { label="Ingreso";
+"Ingreso_596512129" [label="101"];
+}
+subgraph cluster_Traspaso { label="Traspaso";
+"Traspaso_824318946" [label="201"];
+}
+subgraph cluster_Salida { label="Salida";
+"Salida_930990596" [label="301"];
+}
+}

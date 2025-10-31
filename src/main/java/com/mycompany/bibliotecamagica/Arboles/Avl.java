@@ -113,12 +113,15 @@ public class Avl {
     public void insertar(Libro libro) {
         raiz = insertarNodo(raiz, libro);
     }
+
     public void eliminar(String titulo) {
         raiz = eliminarRec(raiz, normalizar(titulo));
     }
 
     private NodoAVL eliminarRec(NodoAVL nodo, String titulo) {
-        if (nodo == null) return null;
+        if (nodo == null) {
+            return null;
+        }
 
         String actual = normalizar(nodo.libro.getTitulo());
 
@@ -128,7 +131,7 @@ public class Avl {
         } else if (titulo.compareTo(actual) > 0) {
             nodo.der = eliminarRec(nodo.der, titulo);
         } else {
-            
+
             if (nodo.izq == null || nodo.der == null) {
                 nodo = (nodo.izq != null) ? nodo.izq : nodo.der;
             } else {
@@ -138,21 +141,25 @@ public class Avl {
             }
         }
 
-        if (nodo == null) return null;
+        if (nodo == null) {
+            return null;
+        }
 
         // Actualizar altura
         nodo.altura = 1 + Math.max(altura(nodo.izq), altura(nodo.der));
 
         // Rebalancear
         int balance = factorEquilibrio(nodo);
-        if (balance > 1 && factorEquilibrio(nodo.izq) >= 0)
+        if (balance > 1 && factorEquilibrio(nodo.izq) >= 0) {
             return rotacionDerecha(nodo);
+        }
         if (balance > 1 && factorEquilibrio(nodo.izq) < 0) {
             nodo.izq = rotacionIzquierda(nodo.izq);
             return rotacionDerecha(nodo);
         }
-        if (balance < -1 && factorEquilibrio(nodo.der) <= 0)
+        if (balance < -1 && factorEquilibrio(nodo.der) <= 0) {
             return rotacionIzquierda(nodo);
+        }
         if (balance < -1 && factorEquilibrio(nodo.der) > 0) {
             nodo.der = rotacionDerecha(nodo.der);
             return rotacionIzquierda(nodo);
@@ -162,9 +169,25 @@ public class Avl {
     }
 
     private NodoAVL obtenerMinimo(NodoAVL nodo) {
-        while (nodo.izq != null)
+        while (nodo.izq != null) {
             nodo = nodo.izq;
+        }
         return nodo;
+    }
+
+    public java.util.List<Libro> aLista() {
+        java.util.List<Libro> res = new java.util.ArrayList<>();
+        aListaRec(raiz, res);
+        return res;
+    }
+
+    private void aListaRec(NodoAVL nodo, java.util.List<Libro> res) {
+        if (nodo == null) {
+            return;
+        }
+        aListaRec(nodo.izq, res);
+        res.add(nodo.libro);
+        aListaRec(nodo.der, res);
     }
 
     public Libro buscar(String titulo) {

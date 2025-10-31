@@ -1,0 +1,10 @@
+digraph BMas {
+node [shape=record, style=filled, color=lightyellow];
+"2084435065" [label="Infantil|Psicológico"];
+"2084435065" -> "1296064247";
+"1296064247" [label="Comedia|Fantasía|Horror"];
+"2084435065" -> "939047783";
+"939047783" [label="Infantil|Mitología"];
+"2084435065" -> "1237514926";
+"1237514926" [label="Psicológico|Terror"];
+}

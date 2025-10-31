@@ -1,0 +1,11 @@
+graph RedBibliotecas {
+node [shape=box, style=filled, color=lightblue];
+"Biblioteca Central" -- "Biblioteca Zona 1" [label="t=10, c=5"];
+"Biblioteca Central" -- "Biblioteca Norte" [label="t=20, c=10"];
+"Biblioteca Zona 1" -- "Biblioteca Central" [label="t=10, c=5"];
+"Biblioteca Zona 1" -- "Biblioteca Sur" [label="t=15, c=8"];
+"Biblioteca Norte" -- "Biblioteca Central" [label="t=20, c=10"];
+"Biblioteca Norte" -- "Biblioteca Sur" [label="t=25, c=12"];
+"Biblioteca Sur" -- "Biblioteca Zona 1" [label="t=15, c=8"];
+"Biblioteca Sur" -- "Biblioteca Norte" [label="t=25, c=12"];
+}

@@ -1,0 +1,13 @@
+digraph HashTable {
+node [shape=record, style=filled, color=lightgoldenrod];
+n0 [label="0"];
+n1 [label="1|Tecnología"];
+n2 [label="2|Educativo"];
+n3 [label="3|Social"];
+n4 [label="4|Ciencia"];
+n5 [label="5"];
+n6 [label="6"];
+n7 [label="7"];
+n8 [label="8"];
+n9 [label="9"];
+}

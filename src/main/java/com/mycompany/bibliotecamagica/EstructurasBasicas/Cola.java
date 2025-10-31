@@ -37,4 +37,26 @@ public class Cola {
 
         return cola;
     }
+
+    public String generarDot(String nombre) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("subgraph cluster_").append(nombre).append(" { label=\"")
+                .append(nombre).append("\";\n");
+
+        Nodo actual = ValorInicial;
+        while (actual != null) {
+            sb.append("\"").append(nombre).append("_").append(actual.hashCode())
+                    .append("\" [label=\"").append(actual.Valor).append("\"];\n");
+
+            if (actual.Siguiente != null) {
+                sb.append("\"").append(nombre).append("_").append(actual.hashCode())
+                        .append("\" -> \"").append(nombre).append("_")
+                        .append(actual.Siguiente.hashCode()).append("\";\n");
+            }
+            actual = actual.Siguiente;
+        }
+
+        sb.append("}\n");
+        return sb.toString();
+    }
 }

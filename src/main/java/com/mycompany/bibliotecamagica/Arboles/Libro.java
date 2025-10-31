@@ -26,6 +26,16 @@ public class Libro {
         this.estado = "Disponible";
     }
 
+    // ✅ Segundo constructor (con estado)
+    public Libro(String titulo, String autor, String isbn, int anio, String genero, String estado) {
+        this.titulo = titulo;
+        this.autor = autor;
+        this.isbn = isbn;
+        this.anio = anio;
+        this.genero = genero;
+        this.estado = estado;
+    }
+
     public String getTitulo() {
         return titulo;
     }
@@ -56,6 +66,6 @@ public class Libro {
 
     @Override
     public String toString() {
-        return titulo + " - " + autor + " (" + anio + ")";
+        return titulo + " - " + autor + " (" + anio + ") [" + genero + "] - Estado: " + estado;
     }
 }

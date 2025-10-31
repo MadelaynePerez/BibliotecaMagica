@@ -8,14 +8,15 @@ package com.mycompany.bibliotecamagica.Arboles;
  *
  * @author Ana
  */
-
 import java.util.*;
 
 public class ArbolBMas {
+
     private static final int ORDEN = 4;
     private NodoBMas raiz;
 
     static class NodoBMas {
+
         boolean hoja;
         ArrayList<String> claves;
         ArrayList<ArrayList<Libro>> libros;
@@ -35,9 +36,10 @@ public class ArbolBMas {
         raiz = new NodoBMas(true);
     }
 
-    // ------------------ INSERTAR ------------------
     public void insertar(Libro libro) {
-        if (raiz == null) raiz = new NodoBMas(true);
+        if (raiz == null) {
+            raiz = new NodoBMas(true);
+        }
 
         Par resultado = insertarRec(raiz, libro);
 
@@ -69,7 +71,9 @@ public class ArbolBMas {
             return new Par("", null);
         } else {
             int i = 0;
-            while (i < nodo.claves.size() && libro.getGenero().compareTo(nodo.claves.get(i)) > 0) i++;
+            while (i < nodo.claves.size() && libro.getGenero().compareTo(nodo.claves.get(i)) > 0) {
+                i++;
+            }
             Par resultado = insertarRec(nodo.hijos.get(i), libro);
 
             if (resultado.nodoDerecho != null) {
@@ -115,8 +119,10 @@ public class ArbolBMas {
     }
 
     private static class Par {
+
         String clave;
         NodoBMas nodoDerecho;
+
         Par(String clave, NodoBMas nodoDerecho) {
             this.clave = clave;
             this.nodoDerecho = nodoDerecho;
@@ -127,24 +133,27 @@ public class ArbolBMas {
         NodoBMas nodo = raiz;
         while (!nodo.hoja) {
             int i = 0;
-            while (i < nodo.claves.size() && genero.compareTo(nodo.claves.get(i)) > 0) i++;
+            while (i < nodo.claves.size() && genero.compareTo(nodo.claves.get(i)) > 0) {
+                i++;
+            }
             nodo = nodo.hijos.get(i);
         }
 
         for (int i = 0; i < nodo.claves.size(); i++) {
-            if (nodo.claves.get(i).equals(genero))
+            if (nodo.claves.get(i).equals(genero)) {
                 return nodo.libros.get(i);
+            }
         }
         return new ArrayList<>();
     }
 
-    
     public void mostrar() {
         NodoBMas nodo = raiz;
-        while (!nodo.hoja)
+        while (!nodo.hoja) {
             nodo = nodo.hijos.get(0);
+        }
 
-        System.out.println("\n📚 Libros por género:");
+        System.out.println("\nLibros por genero:");
         while (nodo != null) {
             for (int i = 0; i < nodo.claves.size(); i++) {
                 System.out.println("- " + nodo.claves.get(i) + " (" + nodo.libros.get(i).size() + " libros)");
@@ -153,14 +162,15 @@ public class ArbolBMas {
         }
     }
 
-    // ------------------ GRAFICAR ------------------
     public void graficar(String nombreArchivo) {
         try {
-            String ruta = "C:\\Users\\Ana\\Desktop\\BibliotecaEdd\\" + nombreArchivo + ".dot";
-            String png = "C:\\Users\\Ana\\Desktop\\BibliotecaEdd\\" + nombreArchivo + ".png";
+            String ruta = "C:\\Users\\Ana\\Documents\\NetBeansProjects\\BibliotecaMagica\\graficos\\" + nombreArchivo + ".dot";
+            String png = "C:\\Users\\Ana\\Documents\\NetBeansProjects\\BibliotecaMagica\\graficos\\" + nombreArchivo + ".png";
 
-            java.io.File carpeta = new java.io.File("C:\\Users\\Ana\\Desktop\\BibliotecaEdd\\");
-            if (!carpeta.exists()) carpeta.mkdirs();
+            java.io.File carpeta = new java.io.File("C:\\Users\\Ana\\Documents\\NetBeansProjects\\BibliotecaMagica\\graficos\\");
+            if (!carpeta.exists()) {
+                carpeta.mkdirs();
+            }
 
             java.io.FileWriter fw = new java.io.FileWriter(ruta);
             fw.write("digraph BMas {\nnode [shape=record, style=filled, color=lightyellow];\n");
@@ -176,12 +186,16 @@ public class ArbolBMas {
     }
 
     private void generarDotRec(NodoBMas nodo, java.io.FileWriter fw) throws Exception {
-        if (nodo == null) return;
+        if (nodo == null) {
+            return;
+        }
 
         fw.write("\"" + nodo.hashCode() + "\" [label=\"");
         for (int i = 0; i < nodo.claves.size(); i++) {
             fw.write(nodo.claves.get(i));
-            if (i != nodo.claves.size() - 1) fw.write("|");
+            if (i != nodo.claves.size() - 1) {
+                fw.write("|");
+            }
         }
         fw.write("\"];\n");
 
@@ -193,4 +207,3 @@ public class ArbolBMas {
         }
     }
 }
-
