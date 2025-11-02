@@ -80,7 +80,6 @@ public class ListaNoOrdenada {
         }
     }
 
-    // ----------------- MÉTODOS AUXILIARES -----------------
     public List<Libro> getLibros() {
         return libros;
     }

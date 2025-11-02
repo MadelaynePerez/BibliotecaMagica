@@ -1,86 +1,47 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.bibliotecamagica;
 
 import com.mycompany.bibliotecamagica.Arboles.Biblioteca;
 import com.mycompany.bibliotecamagica.Arboles.Libro;
 import com.mycompany.bibliotecamagica.EstructurasBasicas.Grafo;
 import com.mycompany.bibliotecamagica.EstructurasBasicas.HashTableISBN;
+import com.mycompany.bibliotecamagica.EstructurasBasicas.TransferenciaLibro;
 import java.util.List;
+import java.util.Map;
 
-/**
- * @author Ana
- */
 public class SimuladorCompleto {
 
-    private Grafo grafo;
-    private HashTableISBN hashGlobal;
+    private final Grafo grafo;
+    private final HashTableISBN hashGlobal;
+    private final Map<String, Biblioteca> bibliotecasPorNombre;
 
-    public SimuladorCompleto(Grafo grafo, HashTableISBN hashGlobal) {
+    public SimuladorCompleto(Grafo grafo, HashTableISBN hashGlobal,
+            Map<String, Biblioteca> bibliotecasPorNombre) {
         this.grafo = grafo;
         this.hashGlobal = hashGlobal;
+        this.bibliotecasPorNombre = bibliotecasPorNombre;
     }
 
     public void transferirLibro(Biblioteca origen, Biblioteca destino, Libro libro, boolean porTiempo) {
-        System.out.println("\n=== SIMULACIÓN COMPLETA DE TRANSFERENCIA ===");
-        System.out.println("Libro: " + libro.getTitulo());
-        System.out.println("Origen: " + origen.getNombre());
-        System.out.println("Destino: " + destino.getNombre());
-        System.out.println("Criterio: " + (porTiempo ? "Tiempo" : "Costo") + "\n");
-
-        if (hashGlobal.buscar(libro.getIsbn()) != null) {
-            System.out.println("El ISBN ya existe en el sistema, se omite duplicado: " + libro.getIsbn());
-            return;
+        if (hashGlobal.buscar(libro.getIsbn()) == null) {
+            hashGlobal.insertar(libro.getIsbn(), libro);
         }
 
-        long inicio = System.currentTimeMillis();
         List<String> ruta = grafo.encontrarRuta(origen.getNombre(), destino.getNombre(), porTiempo);
         if (ruta == null || ruta.isEmpty()) {
-            System.out.println("No hay ruta entre las bibliotecas seleccionadas.");
+            System.out.println("No hay ruta entre " + origen.getNombre() + " y " + destino.getNombre());
             return;
         }
 
-        System.out.println("Ruta elegida: " + String.join(" -> ", ruta));
+        long eta = estimarTiempo(ruta);
+        TransferenciaLibro t = new TransferenciaLibro(libro, origen.getNombre(), destino.getNombre(), porTiempo, ruta, eta);
 
-        libro.setEstado("En tránsito");
-        origen.getColaIngreso().agregarCola(libro.hashCode());
-        hashGlobal.insertar(libro);
-        System.out.println("\nLibro colocado en la cola de ingreso de " + origen.getNombre());
+        origen.getColaIngreso().encolar(t);
+        System.out.println("Transferencia creada de " + libro.getTitulo() + " desde "
+                + origen.getNombre() + " hacia " + destino.getNombre()
+                + " (ETA: " + eta + " ms)");
+    }
 
-        for (int i = 0; i < ruta.size(); i++) {
-            String nombreB = ruta.get(i);
-            System.out.println("\nBiblioteca actual: " + nombreB);
-
-            try {
-                Thread.sleep(700);
-            } catch (InterruptedException ignored) {
-            }
-
-            if (i < ruta.size() - 1) {
-                System.out.println("Preparando traspaso...");
-                origen.getColaIngreso().RemoverCola();
-                origen.getColaTraspaso().agregarCola(libro.hashCode());
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException ignored) {
-                }
-                origen.getColaTraspaso().RemoverCola();
-                origen.getColaSalida().agregarCola(libro.hashCode());
-                System.out.println("Libro enviado hacia el siguiente nodo...");
-            } else {
-                System.out.println("Llegó al destino final: " + destino.getNombre());
-                libro.setEstado("Disponible");
-                destino.insertarLibro(libro);
-                destino.getArbolB().insertar(libro);
-                destino.getArbolBMas().insertar(libro);
-            }
-        }
-
-        long fin = System.currentTimeMillis();
-        System.out.println("\nTiempo total de transferencia: " + (fin - inicio) + " ms");
-        System.out.println("Estado final: " + libro.getEstado());
-        System.out.println("=== SIMULACIÓN FINALIZADA ===\n");
+    private long estimarTiempo(List<String> ruta) {
+        return ruta.size() * 1000L;
     }
 }

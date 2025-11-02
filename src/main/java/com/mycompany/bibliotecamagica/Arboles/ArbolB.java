@@ -197,4 +197,25 @@ public class ArbolB {
     public NodoB getRaiz() {
         return raiz;
     }
+
+    public void eliminarPorAnio(int anio, String titulo) {
+        if (raiz == null) {
+            return;
+        }
+        eliminarRec(raiz, anio, titulo);
+    }
+
+    private void eliminarRec(NodoB nodo, int anio, String titulo) {
+        if (nodo == null) {
+            return;
+        }
+
+        nodo.libros.removeIf(l -> l.getAnio() == anio && l.getTitulo().equalsIgnoreCase(titulo));
+
+        if (!nodo.hoja) {
+            for (NodoB hijo : nodo.hijos) {
+                eliminarRec(hijo, anio, titulo);
+            }
+        }
+    }
 }

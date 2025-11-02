@@ -26,7 +26,7 @@ public class Libro {
         this.estado = "Disponible";
     }
 
-    // ✅ Segundo constructor (con estado)
+   
     public Libro(String titulo, String autor, String isbn, int anio, String genero, String estado) {
         this.titulo = titulo;
         this.autor = autor;

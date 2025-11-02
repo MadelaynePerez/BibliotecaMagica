@@ -33,7 +33,6 @@ public class Grafo {
     private final Map<String, List<Arista>> ady = new HashMap<>();
     private final Map<String, Biblioteca> bibliotecas = new HashMap<>();
 
-    // Registro de bibliotecas
     public void registrarBiblioteca(Biblioteca biblio) {
         bibliotecas.put(biblio.getNombre(), biblio);
         agregarBiblioteca(biblio.getNombre());
@@ -43,7 +42,6 @@ public class Grafo {
         return bibliotecas.get(nombre);
     }
 
-    // Estructura del grafo
     public void agregarBiblioteca(String nombre) {
         ady.putIfAbsent(nombre, new ArrayList<>());
     }
@@ -65,7 +63,6 @@ public class Grafo {
         return ady.getOrDefault(origen, Collections.emptyList());
     }
 
-    // Algoritmo de ruta mínima
     public ResultadoRuta dijkstra(String origen, String destino, Criterio criterio) {
         if (!ady.containsKey(origen) || !ady.containsKey(destino)) {
             return ResultadoRuta.vacio();
@@ -137,7 +134,6 @@ public class Grafo {
         }
     }
 
-    // Método utilizado por el simulador
     public List<String> encontrarRuta(String origen, String destino, boolean porTiempo) {
         Criterio c = porTiempo ? Criterio.TIEMPO : Criterio.COSTO;
         return dijkstra(origen, destino, c).ruta;

@@ -46,12 +46,10 @@ public class Graficador {
         }
     }
 
-    // 1️⃣ AVL
     public static void graficarAVL(Avl avl) {
         guardarDot("AVL", avl.generarDot());
     }
 
-    // 2️⃣ Árbol B
     public static void graficarArbolB(ArbolB arbol) {
         StringBuilder sb = new StringBuilder("digraph ArbolB {\nnode [shape=record, style=filled, color=lightblue];\n");
         generarDotBRec(arbol.getRaiz(), sb);
@@ -82,29 +80,37 @@ public class Graficador {
         }
     }
 
-    // 3️⃣ Árbol B+
     public static void graficarArbolBMas(ArbolBMas arbol) {
         arbol.graficar("ArbolBMas");
     }
 
-    // 4️⃣ Tabla Hash (con colisiones y factor de carga)
     public static void graficarHash(HashTableISBN hash) {
         StringBuilder sb = new StringBuilder("digraph HashTable {\n");
         sb.append("node [shape=record, style=filled, color=lightgoldenrod];\n");
 
+        var tabla = hash.getTabla(); 
         for (int i = 0; i < hash.getTamaño(); i++) {
-            List<Libro> lista = hash.getLista(i);
+            HashTableISBN.Nodo nodo = tabla[i];
             sb.append("n").append(i).append(" [label=\"").append(i);
 
-            if (lista != null && !lista.isEmpty()) {
+            if (nodo != null) {
                 sb.append("|");
-                for (int j = 0; j < lista.size(); j++) {
-                    sb.append(lista.get(j).getIsbn());
-                    if (j < lista.size() - 1) {
+                while (nodo != null) {
+                    if (nodo.valor instanceof com.mycompany.bibliotecamagica.Arboles.Libro l) {
+                        sb.append(l.getIsbn());
+                    } else if (nodo.valor instanceof com.mycompany.bibliotecamagica.Arboles.Biblioteca b) {
+                        sb.append(b.getNombre());
+                    } else {
+                        sb.append("?");
+                    }
+
+                    if (nodo.siguiente != null) {
                         sb.append("|");
                     }
+                    nodo = nodo.siguiente;
                 }
             }
+
             sb.append("\"];\n");
         }
 
@@ -112,7 +118,6 @@ public class Graficador {
         guardarDot("TablaHash", sb.toString());
     }
 
-    // 5️⃣ Red de Bibliotecas (grafo)
     public static void graficarRed(Grafo grafo) {
         StringBuilder sb = new StringBuilder("graph RedBibliotecas {\n");
         sb.append("node [shape=box, style=filled, color=lightblue];\n");
@@ -131,7 +136,6 @@ public class Graficador {
         guardarDot("RedBibliotecas", sb.toString());
     }
 
-    // 6️⃣ Colas (por biblioteca)
     public static void graficarColas(Biblioteca b) {
         StringBuilder sb = new StringBuilder("digraph Colas {\nrankdir=LR;\nnode [shape=box, style=filled, color=lightgrey];\n");
         sb.append(b.getColaIngreso().generarDot("Ingreso"));

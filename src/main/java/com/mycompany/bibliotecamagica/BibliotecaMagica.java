@@ -11,7 +11,7 @@ import com.mycompany.bibliotecamagica.Arboles.Libro;
 import com.mycompany.bibliotecamagica.EstructurasBasicas.Cola;
 import com.mycompany.bibliotecamagica.EstructurasBasicas.Grafo;
 import com.mycompany.bibliotecamagica.EstructurasBasicas.Nodo;
-import com.mycompany.bibliotecamagica.EstructurasBasicas.Pila;
+import com.mycompany.bibliotecamagica.EstructurasBasicas.PilaRollback;
 import com.mycompany.bibliotecamagica.EstructurasBasicas.HashTableISBN;
 import com.mycompany.bibliotecamagica.Vistas.Graficador.Graficador;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class BibliotecaMagica {
     public static void main(String[] args) {
         System.out.println("Hello World!");
 
-        System.out.println("🧩 INICIANDO PRUEBAS DE VISUALIZACIÓN...\n");
+        System.out.println("🧩 INICIANDO PRUEBAS DE VISUALIZACION...\n");
 
         // === 1️⃣ AVL ===
         Avl avl = new Avl();
@@ -64,10 +64,10 @@ public class BibliotecaMagica {
 
         // === 4️⃣ Tabla Hash ===
         HashTableISBN hash = new HashTableISBN(10);
-        hash.insertar(new Libro("111-A", "Matemáticas", "Educativo", 2010, "Smith"));
-        hash.insertar(new Libro("222-B", "Programación", "Tecnología", 2018, "Ana Pérez"));
+        hash.insertar(new Libro("111-A", "Matematicas", "Educativo", 2010, "Smith"));
+        hash.insertar(new Libro("222-B", "Programacion", "Tecnología", 2018, "Ana Perez"));
         hash.insertar(new Libro("333-C", "Historia", "Social", 2005, "Carlos R."));
-        hash.insertar(new Libro("444-D", "Química", "Ciencia", 2015, "Lopez"));
+        hash.insertar(new Libro("444-D", "Quimica", "Ciencia", 2015, "Lopez"));
         System.out.println("✅ Tabla Hash generada.");
         Graficador.graficarHash(hash);
 

@@ -11,7 +11,9 @@ import com.mycompany.bibliotecamagica.Arboles.Libro;
  * @author Ana
  */
 public class ListaDoble {
+
     private class Nodo {
+
         Libro libro;
         Nodo anterior, siguiente;
 
@@ -29,8 +31,6 @@ public class ListaDoble {
         cola = null;
         tamaño = 0;
     }
-
-    // ---------- MÉTODOS PRINCIPALES ----------
 
     public void insertarInicio(Libro libro) {
         Nodo nuevo = new Nodo(libro);
@@ -120,7 +120,6 @@ public class ListaDoble {
         return tamaño == 0;
     }
 
-    // ---------- RECORRIDOS ----------
     public void mostrarInvertido() {
         Nodo actual = cola;
         System.out.println(" Lista Doble (recorrido inverso):");
@@ -130,4 +129,3 @@ public class ListaDoble {
         }
     }
 }
-
