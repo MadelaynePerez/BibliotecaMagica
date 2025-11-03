@@ -4,6 +4,7 @@ import com.mycompany.bibliotecamagica.EstructurasBasicas.Cola;
 import com.mycompany.bibliotecamagica.EstructurasBasicas.ColaObj;
 import com.mycompany.bibliotecamagica.EstructurasBasicas.PilaRollback;
 import com.mycompany.bibliotecamagica.EstructurasBasicas.TransferenciaLibro;
+import com.mycompany.bibliotecamagica.SimuladorCompleto;
 
 public class Biblioteca implements Runnable {
 
@@ -56,6 +57,9 @@ public class Biblioteca implements Runnable {
                     if (t.getDestino().equals(nombre)) {
                         insertarLibro(t.getLibro());
                         System.out.println(nombre + " recibió el libro final: " + t.getLibro().getTitulo());
+                        System.out.println(" Transferencia completada: " + t.getLibro().getTitulo() + " llegó a " + nombre);
+
+                        detener();
                     } else {
                         colaTraspaso.encolar(t);
                     }
@@ -72,6 +76,18 @@ public class Biblioteca implements Runnable {
                     Thread.sleep(intervaloDespacho * 1000);
                     pilaSalida.Agregar(t.getLibro().hashCode());
                     System.out.println(nombre + " despachó el libro: " + t.getLibro().getTitulo());
+
+                    int idx = t.getRuta().indexOf(nombre);
+                    if (idx != -1 && idx + 1 < t.getRuta().size()) {
+                        String siguienteNombre = t.getRuta().get(idx + 1);
+                        Biblioteca siguiente = SimuladorCompleto.redGlobal.get(siguienteNombre);
+                        if (siguiente != null) {
+                            siguiente.getColaIngreso().encolar(t);
+                            System.out.println(" Enviado a " + siguienteNombre);
+                        }
+                    } else {
+                        System.out.println(" Libro llegó a su destino final: " + t.getDestino());
+                    }
                 }
 
                 Thread.sleep(500);

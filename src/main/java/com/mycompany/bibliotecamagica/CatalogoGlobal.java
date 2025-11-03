@@ -15,9 +15,14 @@ public class CatalogoGlobal {
         this.hash = hash;
     }
 
-    /**
-     * Inserta un libro en una biblioteca específica (AVL, B, B+, Hash).
-     */
+    public Map<String, Biblioteca> getBibliotecas() {
+        return bibliotecasPorId;
+    }
+
+    public HashTableISBN getHash() {
+        return hash;
+    }
+
     public void insertarLibroEn(String idBiblioteca, Libro libro) {
         Biblioteca b = bibliotecasPorId.get(idBiblioteca);
 
@@ -39,9 +44,6 @@ public class CatalogoGlobal {
         System.out.println("Libro agregado a " + b.getNombre() + ": " + libro.getTitulo());
     }
 
-    /**
-     * Elimina un libro completamente del sistema.
-     */
     public void eliminarLibro(String isbn) {
         Object obj = hash.buscar(isbn);
         if (obj == null) {
@@ -57,16 +59,13 @@ public class CatalogoGlobal {
         for (Biblioteca b : bibliotecasPorId.values()) {
             b.getArbolAvl().eliminar(libro.getTitulo());
             b.getArbolB().eliminarPorAnio(libro.getAnio(), libro.getTitulo());
-            // En B+ no hay eliminación directa, se ignora o se marca
+
         }
 
         hash.eliminar(isbn);
         System.out.println("Libro eliminado globalmente: " + libro.getTitulo());
     }
 
-    /**
-     * Marca un libro como agotado (por traslado o préstamo).
-     */
     public void marcarAgotado(String isbn) {
         Object obj = hash.buscar(isbn);
         if (obj instanceof Libro l) {
@@ -75,9 +74,6 @@ public class CatalogoGlobal {
         }
     }
 
-    /**
-     * Devuelve (rollback) un libro desde la pila de una biblioteca.
-     */
     public void devolverLibro(String idBiblioteca) {
         Biblioteca b = bibliotecasPorId.get(idBiblioteca);
         if (b == null) {

@@ -231,6 +231,31 @@ public class Avl {
         return sb.toString();
     }
 
+    public void mostrarCoincidencias(String texto, javax.swing.JTextArea area) {
+        mostrarCoincidenciasRec(raiz, texto.toLowerCase(), area);
+    }
+
+    private void mostrarCoincidenciasRec(NodoAVL nodo, String texto, javax.swing.JTextArea area) {
+        if (nodo == null) {
+            return;
+        }
+
+        mostrarCoincidenciasRec(nodo.izq, texto, area);
+
+        Libro l = nodo.libro;
+        String t = l.getTitulo().toLowerCase();
+        String a = l.getAutor().toLowerCase();
+        String g = l.getGenero().toLowerCase();
+        String i = l.getIsbn().toLowerCase();
+        String anio = String.valueOf(l.getAnio());
+
+        if (t.contains(texto) || a.contains(texto) || g.contains(texto) || i.contains(texto) || anio.equals(texto)) {
+            area.append(" " + l.getTitulo() + " | " + l.getAutor() + " | " + l.getAnio() + " | " + l.getGenero() + "\n");
+        }
+
+        mostrarCoincidenciasRec(nodo.der, texto, area);
+    }
+
     private void generarDotRec(NodoAVL nodo, StringBuilder sb) {
         if (nodo == null) {
             return;
