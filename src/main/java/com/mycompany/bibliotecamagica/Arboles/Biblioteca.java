@@ -1,6 +1,5 @@
 package com.mycompany.bibliotecamagica.Arboles;
 
-import com.mycompany.bibliotecamagica.EstructurasBasicas.Cola;
 import com.mycompany.bibliotecamagica.EstructurasBasicas.ColaObj;
 import com.mycompany.bibliotecamagica.EstructurasBasicas.PilaRollback;
 import com.mycompany.bibliotecamagica.EstructurasBasicas.TransferenciaLibro;
@@ -26,6 +25,11 @@ public class Biblioteca implements Runnable {
 
     private boolean activo = true;
 
+    // Contadores
+    private int ingresos;
+    private int traspasos;
+    private int salidas;
+
     public Biblioteca(String id, String nombre, String ubicacion,
             int tiempoIngreso, int tiempoTraspaso, int intervaloDespacho) {
         this.id = id;
@@ -43,6 +47,8 @@ public class Biblioteca implements Runnable {
         this.colaTraspaso = new ColaObj<>();
         this.colaSalida = new ColaObj<>();
         this.pilaSalida = new PilaRollback();
+
+        this.activo = true;
     }
 
     @Override
@@ -52,30 +58,35 @@ public class Biblioteca implements Runnable {
 
                 if (!colaIngreso.estaVacia()) {
                     TransferenciaLibro t = colaIngreso.desencolar();
+                    ingresos++;
+                    System.out.println(nombre + " Ingreso: " + t.getLibro().getTitulo());
                     Thread.sleep(tiempoIngreso * 1000);
 
                     if (t.getDestino().equals(nombre)) {
                         insertarLibro(t.getLibro());
-                        System.out.println(nombre + " recibió el libro final: " + t.getLibro().getTitulo());
-                        System.out.println(" Transferencia completada: " + t.getLibro().getTitulo() + " llegó a " + nombre);
-
-                        detener();
+                        pilaSalida.Agregar(t.getLibro().hashCode());
+                        System.out.println(nombre + " recibió libro final: " + t.getLibro().getTitulo());
                     } else {
                         colaTraspaso.encolar(t);
+                        System.out.println(nombre + " pasa a TRASPASO: " + t.getLibro().getTitulo());
                     }
                 }
 
                 if (!colaTraspaso.estaVacia()) {
                     TransferenciaLibro t = colaTraspaso.desencolar();
+                    traspasos++;
+                    System.out.println(nombre + " Traspasando: " + t.getLibro().getTitulo());
                     Thread.sleep(tiempoTraspaso * 1000);
+
                     colaSalida.encolar(t);
+                    System.out.println(nombre + " pasa a SALIDA: " + t.getLibro().getTitulo());
                 }
 
                 if (!colaSalida.estaVacia()) {
                     TransferenciaLibro t = colaSalida.desencolar();
+                    salidas++;
+                    System.out.println(nombre + " Despachando: " + t.getLibro().getTitulo());
                     Thread.sleep(intervaloDespacho * 1000);
-                    pilaSalida.Agregar(t.getLibro().hashCode());
-                    System.out.println(nombre + " despachó el libro: " + t.getLibro().getTitulo());
 
                     int idx = t.getRuta().indexOf(nombre);
                     if (idx != -1 && idx + 1 < t.getRuta().size()) {
@@ -83,10 +94,12 @@ public class Biblioteca implements Runnable {
                         Biblioteca siguiente = SimuladorCompleto.redGlobal.get(siguienteNombre);
                         if (siguiente != null) {
                             siguiente.getColaIngreso().encolar(t);
-                            System.out.println(" Enviado a " + siguienteNombre);
+                            System.out.println(nombre + " envió " + t.getLibro().getTitulo() + " a " + siguienteNombre);
                         }
                     } else {
-                        System.out.println(" Libro llegó a su destino final: " + t.getDestino());
+                        insertarLibro(t.getLibro());
+                        pilaSalida.Agregar(t.getLibro().hashCode());
+                        System.out.println(nombre + " entrega finalizada: " + t.getLibro().getTitulo());
                     }
                 }
 
@@ -98,7 +111,7 @@ public class Biblioteca implements Runnable {
     }
 
     public void detener() {
-        activo = false;
+        this.activo = false;
     }
 
     public void insertarLibro(Libro libro) {
@@ -139,4 +152,53 @@ public class Biblioteca implements Runnable {
         return pilaSalida;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public String getUbicacion() {
+        return ubicacion;
+    }
+
+    public int getTiempoIngreso() {
+        return tiempoIngreso;
+    }
+
+    public int getTiempoTraspaso() {
+        return tiempoTraspaso;
+    }
+
+    public int getIntervaloDespacho() {
+        return intervaloDespacho;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setUbicacion(String ubicacion) {
+        this.ubicacion = ubicacion;
+    }
+
+    public void setTiempos(int tiempoIngreso, int tiempoTraspaso, int intervaloDespacho) {
+        this.tiempoIngreso = tiempoIngreso;
+        this.tiempoTraspaso = tiempoTraspaso;
+        this.intervaloDespacho = intervaloDespacho;
+    }
+
+    public int getIngresos() {
+        return ingresos;
+    }
+
+    public int getTraspasos() {
+        return traspasos;
+    }
+
+    public int getSalidas() {
+        return salidas;
+    }
+
+    public int getPila() {
+        return pilaSalida.getNumeroDeElementos();
+    }
 }

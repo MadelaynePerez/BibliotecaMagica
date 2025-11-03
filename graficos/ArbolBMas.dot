@@ -1,10 +1,24 @@
 digraph BMas {
 node [shape=record, style=filled, color=lightyellow];
-"2084435065" [label="Infantil|Psicológico"];
-"2084435065" -> "1296064247";
-"1296064247" [label="Comedia|Fantasía|Horror"];
-"2084435065" -> "939047783";
-"939047783" [label="Infantil|Mitología"];
-"2084435065" -> "1237514926";
-"1237514926" [label="Psicológico|Terror"];
+"1157998401" [label="Ficción Religiosa|Novela Romántica"];
+"1157998401" -> "356341211";
+"356341211" [label="Fantasía Épica|Ficción Clásica"];
+"356341211" -> "1108362370";
+"1108362370" [label="Aventura-Histórica|Ciencia Ficción-Distopía"];
+"356341211" -> "1056902003";
+"1056902003" [label="Fantasía Épica|Ficción Clásica"];
+"356341211" -> "1453890626";
+"1453890626" [label="Ficción Clásica|Ficción Infantil"];
+"1157998401" -> "692357313";
+"692357313" [label="No Ficción-Historia"];
+"692357313" -> "1764814143";
+"1764814143" [label="Ficción Religiosa|Gótico-Ciencia Ficción|Misterio-Thriller"];
+"692357313" -> "793958393";
+"793958393" [label="No Ficción-Historia|Novela Histórica-Clásico"];
+"1157998401" -> "1024066781";
+"1024066781" [label="Realismo Mágico"];
+"1024066781" -> "805671229";
+"805671229" [label="Novela Romántica|Realismo Mágico"];
+"1024066781" -> "1588775703";
+"1588775703" [label="Realismo Mágico|Thriller-Misterio"];
 }

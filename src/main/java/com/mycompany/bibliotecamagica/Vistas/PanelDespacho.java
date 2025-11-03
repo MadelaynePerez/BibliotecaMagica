@@ -34,14 +34,10 @@ public class PanelDespacho extends javax.swing.JFrame {
     /**
      * Creates new form PanelDespacho
      */
-    public PanelDespacho() {
-        initComponents();
-    }
-
     private JComboBox<String> comboOrigen, comboDestino;
     private JTextField txtTitulo, txtAutor, txtIsbn, txtAnio, txtGenero;
     private JTextArea areaLog;
-    private JButton btnTiempo, btnCosto, btnVerGrafo, btnVerColas, btnCerrar;
+    private JButton btnTiempo, btnCosto, btnVerGrafo, btnVerColas, btnVerEstado, btnCerrar;
 
     private Grafo grafo;
     private Map<String, Biblioteca> bibliotecas;
@@ -66,14 +62,12 @@ public class PanelDespacho extends javax.swing.JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
 
-        
         JPanel panelSup = new JPanel(new GridLayout(4, 4, 5, 5));
         panelSup.setBorder(BorderFactory.createTitledBorder("Datos de transferencia"));
 
         comboOrigen = new JComboBox<>();
         comboDestino = new JComboBox<>();
 
-       
         for (Map.Entry<String, Biblioteca> entry : this.bibliotecas.entrySet()) {
             comboOrigen.addItem(entry.getKey());
             comboDestino.addItem(entry.getKey());
@@ -102,21 +96,21 @@ public class PanelDespacho extends javax.swing.JFrame {
         panelSup.add(new JLabel("Género:"));
         panelSup.add(txtGenero);
 
-        // ---------- botones ----------
-        JPanel panelBtns = new JPanel(new GridLayout(5, 1, 5, 5));
+        JPanel panelBtns = new JPanel(new GridLayout(6, 1, 5, 5));
         btnTiempo = new JButton("Transferir por TIEMPO");
         btnCosto = new JButton("Transferir por COSTO");
         btnVerGrafo = new JButton("Generar Grafo");
         btnVerColas = new JButton("Ver Estado de Colas");
+        btnVerEstado = new JButton("Ver Estado de Bibliotecas");
         btnCerrar = new JButton("Cerrar");
 
         panelBtns.add(btnTiempo);
         panelBtns.add(btnCosto);
         panelBtns.add(btnVerGrafo);
         panelBtns.add(btnVerColas);
+        panelBtns.add(btnVerEstado);
         panelBtns.add(btnCerrar);
 
-        // ---------- área de log ----------
         areaLog = new JTextArea();
         areaLog.setEditable(false);
         JScrollPane scroll = new JScrollPane(areaLog);
@@ -130,14 +124,47 @@ public class PanelDespacho extends javax.swing.JFrame {
         btnCosto.addActionListener(e -> transferir(false));
         btnVerGrafo.addActionListener(e -> generarImagenGrafo());
         btnVerColas.addActionListener(e -> mostrarEstadoColas());
-        btnCerrar.addActionListener(e -> dispose());
+        btnVerEstado.addActionListener(e -> mostrarEstadoBibliotecas());
+        btnCerrar.addActionListener(e -> {
+            if (this.simulador != null) {
+                this.simulador.detenerHilos();
+            }
+            dispose();
+        });
+        /*new Thread(() -> {
+            while (true) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("=== ESTADO GENERAL DE LAS BIBLIOTECAS ===\n");
+                for (Biblioteca b : bibliotecas.values()) {
+                    sb.append("\n").append(b.getNombre()).append("\n");
+                    sb.append("Ingresos: ").append(b.getIngresos()).append("\n");
+                    sb.append("Traspasos: ").append(b.getTraspasos()).append("\n");
+                    sb.append("Salidas: ").append(b.getSalidas()).append("\n");
+                    sb.append("Pila: ").append(b.getPila()).append("\n");
+                }
+                areaLog.setText(sb.toString());
+
+                try {
+                    Thread.sleep(1500);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+        }).start();*/
+        if (grafo != null) {
+            grafo.agregarConexion("A-101", "B-205", 3, 4, true);
+            grafo.agregarConexion("B-205", "C-309", 4, 6, true);
+            grafo.agregarConexion("C-309", "D-412", 5, 7, true);
+            grafo.agregarConexion("A-101", "D-412", 6, 8, true);
+            System.out.println("Conexiones de prueba cargadas:");
+            System.out.println(grafo.mostrarTexto());
+        }
     }
 
-   
     private void transferir(boolean porTiempo) {
         try {
-            String origenNombre = comboOrigen.getSelectedItem().toString();
-            String destinoNombre = comboDestino.getSelectedItem().toString();
+            String origenNombre = comboOrigen.getSelectedItem().toString().trim();
+            String destinoNombre = comboDestino.getSelectedItem().toString().trim();
 
             if (origenNombre.equals(destinoNombre)) {
                 JOptionPane.showMessageDialog(this, "Seleccione bibliotecas distintas.");
@@ -160,24 +187,38 @@ public class PanelDespacho extends javax.swing.JFrame {
 
             Libro libro = new Libro(titulo, autor, isbn, anio, genero);
 
-            areaLog.append(" Iniciando transferencia de \"" + titulo + "\"\n");
+            areaLog.append("\n==============================\n");
+            areaLog.append("Iniciando transferencia de \"" + titulo + "\"\n");
             areaLog.append("Desde " + origenNombre + " hasta " + destinoNombre + "\n");
 
-            List<String> ruta = grafo.encontrarRuta(origenNombre, destinoNombre, porTiempo);
-            areaLog.append("Ruta: " + ruta + "\n\n");
+            System.out.println(grafo.mostrarTexto());
 
-           
+            List<String> ruta = grafo.encontrarRuta(origenNombre, destinoNombre, porTiempo);
+
+            if (ruta == null || ruta.isEmpty()) {
+                areaLog.append(" No hay ruta entre " + origenNombre + " y " + destinoNombre + "\n");
+                JOptionPane.showMessageDialog(this,
+                        "No se encontró ruta entre " + origenNombre + " y " + destinoNombre,
+                        "Ruta no encontrada",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            areaLog.append("Ruta encontrada: " + ruta + "\n\n");
+
             Thread hilo = new Thread(() -> {
                 simulador.transferirLibro(origenNombre, destinoNombre, libro, porTiempo);
             });
             hilo.start();
 
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Año inválido. Ingrese un número entero.");
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error en transferencia: " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 
-   
     private void generarImagenGrafo() {
         try {
             File dot = new File("grafo.dot");
@@ -192,7 +233,7 @@ public class PanelDespacho extends javax.swing.JFrame {
             fw.write("}\n");
             fw.close();
             Runtime.getRuntime().exec("dot -Tpng grafo.dot -o grafo.png");
-            JOptionPane.showMessageDialog(this, " Se generó 'grafo.png' en la carpeta del proyecto.");
+            JOptionPane.showMessageDialog(this, "Se generó 'grafo.png' en la carpeta del proyecto.");
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error al generar el grafo: " + ex.getMessage());
         }
@@ -202,10 +243,23 @@ public class PanelDespacho extends javax.swing.JFrame {
         StringBuilder sb = new StringBuilder();
         for (Biblioteca b : bibliotecas.values()) {
             sb.append("\n=== ").append(b.getNombre()).append(" ===\n");
-            sb.append("📥 Ingreso: ").append(b.getColaIngreso().size()).append("\n");
-            sb.append("⚙️ Traspaso: ").append(b.getColaTraspaso().size()).append("\n");
-            sb.append("📤 Salida: ").append(b.getColaSalida().size()).append("\n");
-            sb.append("🧱 Pila: ").append(b.getPilaSalida().getNumeroDeElementos()).append("\n");
+            sb.append("Ingreso: ").append(b.getColaIngreso().size()).append("\n");
+            sb.append("Traspaso: ").append(b.getColaTraspaso().size()).append("\n");
+            sb.append("Salida: ").append(b.getColaSalida().size()).append("\n");
+            sb.append("Pila: ").append(b.getPilaSalida().getNumeroDeElementos()).append("\n");
+        }
+        areaLog.setText(sb.toString());
+    }
+
+    private void mostrarEstadoBibliotecas() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== ESTADO GENERAL DE LAS BIBLIOTECAS ===\n");
+        for (Biblioteca b : bibliotecas.values()) {
+            sb.append("\n").append(b.getNombre()).append("\n");
+            sb.append("Ingresos: ").append(b.getIngresos()).append("\n");
+            sb.append("Traspasos: ").append(b.getTraspasos()).append("\n");
+            sb.append("Salidas: ").append(b.getSalidas()).append("\n");
+            sb.append("Pila: ").append(b.getPila()).append("\n");
         }
         areaLog.setText(sb.toString());
     }

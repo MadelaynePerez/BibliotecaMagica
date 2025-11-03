@@ -64,4 +64,7 @@ public class SimuladorCompleto {
                 + origenNombre + " hacia " + destinoNombre);
         System.out.println("Ruta: " + resultado.ruta);
     }
+    public HashTableISBN getHash() {
+    return this.hashGlobal;
+}
 }

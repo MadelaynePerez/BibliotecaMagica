@@ -1,0 +1,50 @@
+digraph TodasColas {
+rankdir=LR;
+node [shape=box, style=filled, color=lightgrey];
+subgraph cluster_Sede_Mágica_Norte {
+label="Sede Mágica Norte";
+subgraph cluster_Ingreso_Sede Mágica Norte { label="Ingreso_Sede Mágica Norte";
+"Ingreso_Sede Mágica Norte_0" [label="Transferencia de "anita" (E-507 → C-309)"];
+}
+subgraph cluster_Traspaso_Sede Mágica Norte { label="Traspaso_Sede Mágica Norte";
+}
+subgraph cluster_Salida_Sede Mágica Norte { label="Salida_Sede Mágica Norte";
+}
+}
+subgraph cluster_Plataforma_Logística_Sur {
+label="Plataforma Logística Sur";
+subgraph cluster_Ingreso_Plataforma Logística Sur { label="Ingreso_Plataforma Logística Sur";
+}
+subgraph cluster_Traspaso_Plataforma Logística Sur { label="Traspaso_Plataforma Logística Sur";
+}
+subgraph cluster_Salida_Plataforma Logística Sur { label="Salida_Plataforma Logística Sur";
+}
+}
+subgraph cluster_Centro_de_Distribución {
+label="Centro de Distribución";
+subgraph cluster_Ingreso_Centro de Distribución { label="Ingreso_Centro de Distribución";
+}
+subgraph cluster_Traspaso_Centro de Distribución { label="Traspaso_Centro de Distribución";
+}
+subgraph cluster_Salida_Centro de Distribución { label="Salida_Centro de Distribución";
+}
+}
+subgraph cluster_Almacén_Principal {
+label="Almacén Principal";
+subgraph cluster_Ingreso_Almacén Principal { label="Ingreso_Almacén Principal";
+}
+subgraph cluster_Traspaso_Almacén Principal { label="Traspaso_Almacén Principal";
+}
+subgraph cluster_Salida_Almacén Principal { label="Salida_Almacén Principal";
+}
+}
+subgraph cluster_Depósito_Temporal {
+label="Depósito Temporal";
+subgraph cluster_Ingreso_Depósito Temporal { label="Ingreso_Depósito Temporal";
+}
+subgraph cluster_Traspaso_Depósito Temporal { label="Traspaso_Depósito Temporal";
+}
+subgraph cluster_Salida_Depósito Temporal { label="Salida_Depósito Temporal";
+}
+}
+}

@@ -1,16 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.bibliotecamagica.EstructurasBasicas;
 
 import com.mycompany.bibliotecamagica.Arboles.Biblioteca;
 import java.util.*;
 
-/**
- *
- * @author Ana
- */
 public class Grafo {
 
     public enum Criterio {
@@ -24,9 +16,14 @@ public class Grafo {
         public final int costo;
 
         public Arista(String destino, int tiempo, int costo) {
-            this.destino = destino;
+            this.destino = destino.trim();
             this.tiempo = tiempo;
             this.costo = costo;
+        }
+
+        @Override
+        public String toString() {
+            return destino + "(t=" + tiempo + ", c=" + costo + ")";
         }
     }
 
@@ -34,16 +31,16 @@ public class Grafo {
     private final Map<String, Biblioteca> bibliotecas = new HashMap<>();
 
     public void registrarBiblioteca(Biblioteca biblio) {
-        bibliotecas.put(biblio.getNombre(), biblio);
-        agregarBiblioteca(biblio.getNombre());
-    }
-
-    public Biblioteca obtenerBiblioteca(String nombre) {
-        return bibliotecas.get(nombre);
+        if (biblio != null) {
+            bibliotecas.put(biblio.getNombre().trim(), biblio);
+            agregarBiblioteca(biblio.getNombre().trim());
+        }
     }
 
     public void agregarBiblioteca(String nombre) {
-        ady.putIfAbsent(nombre, new ArrayList<>());
+        if (nombre != null && !nombre.trim().isEmpty()) {
+            ady.putIfAbsent(nombre.trim(), new ArrayList<>());
+        }
     }
 
     public Map<String, List<Arista>> getAdyacencia() {
@@ -51,6 +48,8 @@ public class Grafo {
     }
 
     public void agregarConexion(String origen, String destino, int tiempo, int costo, boolean bidireccional) {
+        origen = origen.trim();
+        destino = destino.trim();
         agregarBiblioteca(origen);
         agregarBiblioteca(destino);
         ady.get(origen).add(new Arista(destino, tiempo, costo));
@@ -60,16 +59,21 @@ public class Grafo {
     }
 
     public List<Arista> vecinos(String origen) {
-        return ady.getOrDefault(origen, Collections.emptyList());
+        return ady.getOrDefault(origen.trim(), Collections.emptyList());
     }
 
     public ResultadoRuta dijkstra(String origen, String destino, Criterio criterio) {
+        origen = origen.trim();
+        destino = destino.trim();
+
         if (!ady.containsKey(origen) || !ady.containsKey(destino)) {
+            System.out.println("No existe alguno de los nodos: " + origen + " o " + destino);
             return ResultadoRuta.vacio();
         }
 
         Map<String, Integer> dist = new HashMap<>();
         Map<String, String> prev = new HashMap<>();
+
         for (String v : ady.keySet()) {
             dist.put(v, Integer.MAX_VALUE);
         }
@@ -83,12 +87,14 @@ public class Grafo {
             if (u.equals(destino)) {
                 break;
             }
+
             for (Arista e : vecinos(u)) {
-                int w = (criterio == Criterio.TIEMPO ? e.tiempo : e.costo);
-                if (dist.get(u) == Integer.MAX_VALUE) {
+                int peso = (criterio == Criterio.TIEMPO) ? e.tiempo : e.costo;
+                if (peso < 0) {
                     continue;
                 }
-                int alt = dist.get(u) + w;
+
+                int alt = dist.get(u) + peso;
                 if (alt < dist.getOrDefault(e.destino, Integer.MAX_VALUE)) {
                     dist.put(e.destino, alt);
                     prev.put(e.destino, u);
@@ -99,6 +105,7 @@ public class Grafo {
         }
 
         if (dist.get(destino) == Integer.MAX_VALUE) {
+            System.out.println("No hay ruta disponible entre " + origen + " y " + destino);
             return ResultadoRuta.vacio();
         }
 
@@ -128,15 +135,16 @@ public class Grafo {
 
         @Override
         public String toString() {
-            return ruta.isEmpty()
-                    ? "Sin ruta"
+            return ruta.isEmpty() ? "Sin ruta"
                     : "Ruta: " + String.join(" -> ", ruta) + " | " + criterio + "=" + pesoTotal;
         }
     }
 
     public List<String> encontrarRuta(String origen, String destino, boolean porTiempo) {
         Criterio c = porTiempo ? Criterio.TIEMPO : Criterio.COSTO;
-        return dijkstra(origen, destino, c).ruta;
+        ResultadoRuta r = dijkstra(origen, destino, c);
+        System.out.println(r.toString());
+        return r.ruta;
     }
 
     public String mostrarTexto() {
@@ -144,7 +152,7 @@ public class Grafo {
         for (var e : ady.entrySet()) {
             sb.append("  ").append(e.getKey()).append(" -> ");
             for (var a : e.getValue()) {
-                sb.append(a.destino).append("(t=").append(a.tiempo).append(",c=").append(a.costo).append(") ");
+                sb.append(a).append(" ");
             }
             sb.append("\n");
         }

@@ -4,6 +4,9 @@
  */
 package com.mycompany.bibliotecamagica.Arboles;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Ana
@@ -125,7 +128,6 @@ public class Avl {
 
         String actual = normalizar(nodo.libro.getTitulo());
 
-        // Buscar el nodo a eliminar
         if (titulo.compareTo(actual) < 0) {
             nodo.izq = eliminarRec(nodo.izq, titulo);
         } else if (titulo.compareTo(actual) > 0) {
@@ -270,6 +272,20 @@ public class Avl {
             sb.append("  \"").append(nodo.libro.getTitulo()).append("\" -> \"")
                     .append(nodo.der.libro.getTitulo()).append("\";\n");
             generarDotRec(nodo.der, sb);
+        }
+    }
+
+    public List<Libro> obtenerTodosLosLibros() {
+        List<Libro> resultado = new ArrayList<>();
+        obtenerLibrosRec(raiz, resultado);
+        return resultado;
+    }
+
+    private void obtenerLibrosRec(NodoAVL nodo, List<Libro> lista) {
+        if (nodo != null) {
+            obtenerLibrosRec(nodo.izq, lista);
+            lista.add(nodo.libro);
+            obtenerLibrosRec(nodo.der, lista);
         }
     }
 }

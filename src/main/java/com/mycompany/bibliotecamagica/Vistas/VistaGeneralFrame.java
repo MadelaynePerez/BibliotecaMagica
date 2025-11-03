@@ -5,13 +5,20 @@
 package com.mycompany.bibliotecamagica.Vistas;
 
 import com.mycompany.bibliotecamagica.Arboles.Biblioteca;
+import com.mycompany.bibliotecamagica.Arboles.Libro;
+import com.mycompany.bibliotecamagica.CargaArchivo;
 import com.mycompany.bibliotecamagica.CatalogoGlobal;
 import com.mycompany.bibliotecamagica.EstructurasBasicas.Grafo;
 import com.mycompany.bibliotecamagica.EstructurasBasicas.HashTableISBN;
 import com.mycompany.bibliotecamagica.EstructurasBasicas.ListaNoOrdenada;
+import com.mycompany.bibliotecamagica.SimuladorCompleto;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import static java.util.Objects.hash;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -19,22 +26,25 @@ import static java.util.Objects.hash;
  */
 public class VistaGeneralFrame extends javax.swing.JFrame {
 
-    private java.util.Map<String, com.mycompany.bibliotecamagica.Arboles.Biblioteca> bibliotecas;
-    private com.mycompany.bibliotecamagica.EstructurasBasicas.HashTableISBN hash;
-    private ListaNoOrdenada listaNoOrdenada;
-    private CatalogoGlobal catalogoGlobal;
-    private Grafo grafo;
+    Map<String, Biblioteca> bibliotecas = new HashMap<>();
+    Grafo grafo = new Grafo();
+    HashTableISBN hash = new HashTableISBN();
+    CargaArchivo cargador = new CargaArchivo();
+    CatalogoGlobal catalogoGlobal;
+    ListaNoOrdenada listaNoOrdenada;
 
     /**
      * Creates new form VistaGeneral
      */
     public VistaGeneralFrame() {
         initComponents();
+        bibliotecas = new HashMap<>();
+        grafo = new Grafo();
         hash = new HashTableISBN();
-        bibliotecas = new java.util.HashMap<>();
+        cargador = new CargaArchivo();
+
         catalogoGlobal = new CatalogoGlobal(bibliotecas, hash);
         listaNoOrdenada = new ListaNoOrdenada();
-        grafo = new Grafo();
     }
 
     /**
@@ -51,10 +61,10 @@ public class VistaGeneralFrame extends javax.swing.JFrame {
         BusquedasPanel = new javax.swing.JButton();
         Ordenamiento = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
+        Graficador = new javax.swing.JButton();
         PanelLibros = new javax.swing.JButton();
         biblioteca = new javax.swing.JButton();
-        jButton9 = new javax.swing.JButton();
+        CargaArchivo = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -91,13 +101,13 @@ public class VistaGeneralFrame extends javax.swing.JFrame {
         });
         jPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 250, -1, -1));
 
-        jButton6.setText("Graficas");
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
+        Graficador.setText("Graficas");
+        Graficador.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
+                GraficadorActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 280, -1, -1));
+        jPanel1.add(Graficador, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 280, -1, -1));
 
         PanelLibros.setText("Libros");
         PanelLibros.addActionListener(new java.awt.event.ActionListener() {
@@ -115,44 +125,50 @@ public class VistaGeneralFrame extends javax.swing.JFrame {
         });
         jPanel1.add(biblioteca, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 130, -1, -1));
 
-        jButton9.setText("Carga Archivo");
-        jPanel1.add(jButton9, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 100, -1, -1));
+        CargaArchivo.setText("Carga Archivo");
+        CargaArchivo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CargaArchivoActionPerformed(evt);
+            }
+        });
+        jPanel1.add(CargaArchivo, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 100, -1, -1));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 730, 420));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+    private void GraficadorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GraficadorActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton6ActionPerformed
+        PanelGraficador g = new PanelGraficador(bibliotecas, grafo, hash);
+        g.setVisible(true);
+    }//GEN-LAST:event_GraficadorActionPerformed
 
     private void bibliotecaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bibliotecaActionPerformed
         // TODO add your handling code here:
-        HashTableISBN hash = new HashTableISBN();
-        Map<String, Biblioteca> bibliotecas = new HashMap<>();
-
-        PanelBibliotecas ventana = new PanelBibliotecas(hash, bibliotecas);
+        PanelBibliotecas ventana = new PanelBibliotecas(bibliotecas, grafo);
         ventana.setVisible(true);
+
     }//GEN-LAST:event_bibliotecaActionPerformed
 
     private void PanelLibrosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PanelLibrosActionPerformed
         // TODO add your handling code here:
-        CatalogoGlobal catalogo = new CatalogoGlobal(bibliotecas, hash);
-        PanelLibros ventana = new PanelLibros(catalogo);
+        PanelLibros ventana = new PanelLibros(bibliotecas, hash);
         ventana.setVisible(true);
     }//GEN-LAST:event_PanelLibrosActionPerformed
 
     private void BusquedasPanelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BusquedasPanelActionPerformed
         // TODO add your handling code here:
-        CatalogoGlobal catalogo = new CatalogoGlobal(bibliotecas, hash);
-        ListaNoOrdenada lista = new ListaNoOrdenada();
-        PanelBusqueda ventana = new PanelBusqueda(catalogo, lista);
+        PanelBusqueda ventana = new PanelBusqueda(catalogoGlobal, listaNoOrdenada);
         ventana.setVisible(true);
     }//GEN-LAST:event_BusquedasPanelActionPerformed
 
     private void OrdenamientoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OrdenamientoActionPerformed
         // TODO add your handling code here:
+        if (listaNoOrdenada == null || listaNoOrdenada.estaVacia()) {
+            JOptionPane.showMessageDialog(this, "No hay libros cargados todavía.");
+            return;
+        }
         PanelOrdenamiento ventana = new PanelOrdenamiento(listaNoOrdenada);
         ventana.setVisible(true);
     }//GEN-LAST:event_OrdenamientoActionPerformed
@@ -162,6 +178,42 @@ public class VistaGeneralFrame extends javax.swing.JFrame {
         PanelDespacho ventana = new PanelDespacho(grafo, bibliotecas);
         ventana.setVisible(true);
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void CargaArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CargaArchivoActionPerformed
+
+        PanelCargaArchivos ventana = new PanelCargaArchivos(bibliotecas, grafo, hash, cargador);
+
+        ventana.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                listaNoOrdenada.limpiar();
+
+                for (Biblioteca b : bibliotecas.values()) {
+                    if (b.getArbolAvl() != null) {
+                        for (Libro l : b.getArbolAvl().obtenerTodosLosLibros()) {
+                            listaNoOrdenada.agregar(l);
+                        }
+                    }
+                    if (b.getArbolB() != null) {
+                        for (Libro l : b.getArbolB().obtenerTodosLosLibros()) {
+                            listaNoOrdenada.agregar(l);
+                        }
+                    }
+                    if (b.getArbolBMas() != null) {
+                        for (Libro l : b.getArbolBMas().obtenerTodosLosLibros()) {
+                            listaNoOrdenada.agregar(l);
+                        }
+                    }
+                }
+
+                System.out.println(" Se cargaron " + listaNoOrdenada.getTamaño() + " libros al catálogo global.");
+            }
+        });
+
+        ventana.setVisible(true);
+
+
+    }//GEN-LAST:event_CargaArchivoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -201,13 +253,14 @@ public class VistaGeneralFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BusquedasPanel;
+    private javax.swing.JButton CargaArchivo;
+    private javax.swing.JButton Graficador;
     private javax.swing.JButton Ordenamiento;
     private javax.swing.JButton PanelLibros;
     private javax.swing.JButton biblioteca;
     private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton9;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
+
 }

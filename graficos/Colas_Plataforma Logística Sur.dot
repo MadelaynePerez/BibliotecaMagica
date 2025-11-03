@@ -1,0 +1,10 @@
+digraph Colas {
+rankdir=LR;
+node [shape=box, style=filled, color=lightgrey];
+subgraph cluster_Ingreso { label="Ingreso";
+}
+subgraph cluster_Traspaso { label="Traspaso";
+}
+subgraph cluster_Salida { label="Salida";
+}
+}

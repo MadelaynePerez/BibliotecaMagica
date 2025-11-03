@@ -40,7 +40,7 @@ public class Graficador {
             }
 
             Runtime.getRuntime().exec("dot -Tpng \"" + dot + "\" -o \"" + png + "\"");
-            System.out.println("✅ Gráfico generado: " + png);
+            System.out.println(" Gráfico generado: " + png);
         } catch (IOException e) {
             System.err.println("Error al guardar gráfico: " + e.getMessage());
         }
@@ -88,7 +88,7 @@ public class Graficador {
         StringBuilder sb = new StringBuilder("digraph HashTable {\n");
         sb.append("node [shape=record, style=filled, color=lightgoldenrod];\n");
 
-        var tabla = hash.getTabla(); 
+        var tabla = hash.getTabla();
         for (int i = 0; i < hash.getTamaño(); i++) {
             HashTableISBN.Nodo nodo = tabla[i];
             sb.append("n").append(i).append(" [label=\"").append(i);
@@ -143,5 +143,22 @@ public class Graficador {
         sb.append(b.getColaSalida().generarDot("Salida"));
         sb.append("}\n");
         guardarDot("Colas_" + b.getNombre(), sb.toString());
+    }
+
+    public static void graficarTodasLasColas(Map<String, Biblioteca> bibliotecas) {
+        StringBuilder sb = new StringBuilder("digraph TodasColas {\nrankdir=LR;\n");
+        sb.append("node [shape=box, style=filled, color=lightgrey];\n");
+
+        for (Biblioteca b : bibliotecas.values()) {
+            sb.append("subgraph cluster_").append(b.getNombre().replace(" ", "_")).append(" {\n");
+            sb.append("label=\"").append(b.getNombre()).append("\";\n");
+            sb.append(b.getColaIngreso().generarDot("Ingreso_" + b.getNombre()));
+            sb.append(b.getColaTraspaso().generarDot("Traspaso_" + b.getNombre()));
+            sb.append(b.getColaSalida().generarDot("Salida_" + b.getNombre()));
+            sb.append("}\n");
+        }
+
+        sb.append("}\n");
+        guardarDot("Colas_TodasBibliotecas", sb.toString());
     }
 }

@@ -53,13 +53,17 @@ public class ArbolBMas {
     }
 
     private Par insertarRec(NodoBMas nodo, Libro libro) {
+
+        String generoSeguro = libro.getGenero() != null ? libro.getGenero().trim() : "Desconocido";
+        generoSeguro = generoSeguro.replace("/", "-");
+
         if (nodo.hoja) {
-            int idx = Collections.binarySearch(nodo.claves, libro.getGenero());
+            int idx = Collections.binarySearch(nodo.claves, generoSeguro);
             if (idx >= 0) {
                 nodo.libros.get(idx).add(libro);
             } else {
                 idx = -idx - 1;
-                nodo.claves.add(idx, libro.getGenero());
+                nodo.claves.add(idx, generoSeguro);
                 ArrayList<Libro> lista = new ArrayList<>();
                 lista.add(libro);
                 nodo.libros.add(idx, lista);
@@ -69,11 +73,13 @@ public class ArbolBMas {
                 return dividirHoja(nodo);
             }
             return new Par("", null);
+
         } else {
             int i = 0;
-            while (i < nodo.claves.size() && libro.getGenero().compareTo(nodo.claves.get(i)) > 0) {
+            while (i < nodo.claves.size() && generoSeguro.compareTo(nodo.claves.get(i)) > 0) {
                 i++;
             }
+
             Par resultado = insertarRec(nodo.hijos.get(i), libro);
 
             if (resultado.nodoDerecho != null) {
@@ -205,5 +211,26 @@ public class ArbolBMas {
                 generarDotRec(hijo, fw);
             }
         }
+    }
+
+    public List<Libro> obtenerTodosLosLibros() {
+        List<Libro> resultado = new ArrayList<>();
+        if (raiz != null) {
+            NodoBMas nodo = obtenerHojaIzquierda(raiz);
+            while (nodo != null) {
+                for (List<Libro> listaLibros : nodo.libros) {
+                    resultado.addAll(listaLibros);
+                }
+                nodo = nodo.siguiente;
+            }
+        }
+        return resultado;
+    }
+
+    private NodoBMas obtenerHojaIzquierda(NodoBMas nodo) {
+        while (nodo != null && !nodo.hoja) {
+            nodo = nodo.hijos.get(0);
+        }
+        return nodo;
     }
 }

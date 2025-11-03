@@ -7,10 +7,12 @@ package com.mycompany.bibliotecamagica.Vistas;
 import com.mycompany.bibliotecamagica.Arboles.Biblioteca;
 import com.mycompany.bibliotecamagica.Arboles.Libro;
 import com.mycompany.bibliotecamagica.CatalogoGlobal;
+import com.mycompany.bibliotecamagica.EstructurasBasicas.HashTableISBN;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -30,149 +32,283 @@ public class PanelLibros extends javax.swing.JFrame {
     /**
      * Creates new form PanelLibros
      */
-    private JComboBox<String> comboBibliotecas;
-    private JTextField txtTitulo, txtAutor, txtIsbn, txtAnio, txtGenero, txtEliminar;
-    private JButton btnAgregar, btnEliminar, btnBuscar, btnCerrar;
-    private JTextArea areaResultado;
+    private final Map<String, Biblioteca> bibliotecas;
+    private final HashTableISBN hash;
 
-    private CatalogoGlobal catalogo;
+    private JTextField txtTitulo, txtAutor, txtIsbn, txtAnio, txtGenero, txtEstado;
+    private JComboBox<String> comboOrigen, comboDestino, comboPrioridad;
+    private JTextArea areaLog;
 
-    public PanelLibros(CatalogoGlobal catalogo) {
-        this.catalogo = catalogo;
-        inicializar();
+    public PanelLibros(Map<String, Biblioteca> bibliotecas, HashTableISBN hash) {
+        this.bibliotecas = bibliotecas;
+        this.hash = hash;
+        initUI();
+        llenarCombosBibliotecas();
     }
 
-    public PanelLibros() {
-        this(new CatalogoGlobal(new java.util.HashMap<>(), new com.mycompany.bibliotecamagica.EstructurasBasicas.HashTableISBN()));
-    }
-
-    private void inicializar() {
-        setTitle("Gestión de Libros 📚");
-        setSize(600, 500);
+    private void initUI() {
+        setTitle("Gestión de Libros");
+        setSize(700, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        getContentPane().setBackground(new Color(240, 235, 245));
         setLayout(new BorderLayout(10, 10));
 
-        JPanel panelDatos = new JPanel(new GridLayout(6, 2, 5, 5));
-        panelDatos.setBorder(BorderFactory.createTitledBorder("Agregar Libro"));
+        JPanel panelCampos = new JPanel(new GridLayout(8, 2, 10, 10));
+        panelCampos.setBorder(BorderFactory.createTitledBorder("Datos del Libro"));
+
         txtTitulo = new JTextField();
         txtAutor = new JTextField();
         txtIsbn = new JTextField();
         txtAnio = new JTextField();
         txtGenero = new JTextField();
-        comboBibliotecas = new JComboBox<>();
+        txtEstado = new JTextField();
 
-        for (String id : catalogo.getBibliotecas().keySet()) {
-            comboBibliotecas.addItem(id);
-        }
+        comboOrigen = new JComboBox<>();
+        comboDestino = new JComboBox<>();
+        comboPrioridad = new JComboBox<>(new String[]{"Alta", "Media", "Baja"});
 
-        panelDatos.add(new JLabel("Título:"));
-        panelDatos.add(txtTitulo);
-        panelDatos.add(new JLabel("Autor:"));
-        panelDatos.add(txtAutor);
-        panelDatos.add(new JLabel("ISBN:"));
-        panelDatos.add(txtIsbn);
-        panelDatos.add(new JLabel("Año:"));
-        panelDatos.add(txtAnio);
-        panelDatos.add(new JLabel("Género:"));
-        panelDatos.add(txtGenero);
-        panelDatos.add(new JLabel("ID Biblioteca:"));
-        panelDatos.add(comboBibliotecas);
+        panelCampos.add(new JLabel("Título:"));
+        panelCampos.add(txtTitulo);
+        panelCampos.add(new JLabel("Autor:"));
+        panelCampos.add(txtAutor);
+        panelCampos.add(new JLabel("ISBN:"));
+        panelCampos.add(txtIsbn);
+        panelCampos.add(new JLabel("Año:"));
+        panelCampos.add(txtAnio);
+        panelCampos.add(new JLabel("Género:"));
+        panelCampos.add(txtGenero);
+        panelCampos.add(new JLabel("Estado:"));
+        panelCampos.add(txtEstado);
+        panelCampos.add(new JLabel("Origen:"));
+        panelCampos.add(comboOrigen);
+        panelCampos.add(new JLabel("Destino:"));
+        panelCampos.add(comboDestino);
 
-        JPanel panelBotones = new JPanel(new GridLayout(4, 1, 5, 5));
-        btnAgregar = new JButton("Agregar Libro");
-        btnEliminar = new JButton("Eliminar Libro");
-        btnBuscar = new JButton("Buscar Libro");
-        btnCerrar = new JButton("Cerrar");
+        JPanel panelBotones = new JPanel(new FlowLayout());
+        JButton btnAgregar = new JButton("Agregar Libro");
+        JButton btnBuscar = new JButton("Buscar Libro");
+        JButton btnEliminar = new JButton("Eliminar Libro");
+        JButton btnCerrar = new JButton("Cerrar");
+
         panelBotones.add(btnAgregar);
-        panelBotones.add(btnEliminar);
         panelBotones.add(btnBuscar);
+        panelBotones.add(btnEliminar);
         panelBotones.add(btnCerrar);
 
-        areaResultado = new JTextArea();
-        areaResultado.setEditable(false);
-        JScrollPane scroll = new JScrollPane(areaResultado);
-        scroll.setBorder(BorderFactory.createTitledBorder("Resultados"));
+        areaLog = new JTextArea();
+        areaLog.setEditable(false);
+        JScrollPane scroll = new JScrollPane(areaLog);
+        scroll.setBorder(BorderFactory.createTitledBorder("Resultado"));
 
-        JPanel panelEliminar = new JPanel(new FlowLayout());
-        txtEliminar = new JTextField(20);
-        panelEliminar.add(new JLabel("Título / ISBN / Género / Año:"));
-        panelEliminar.add(txtEliminar);
-
-        add(panelDatos, BorderLayout.NORTH);
-        add(panelBotones, BorderLayout.EAST);
+        add(panelCampos, BorderLayout.NORTH);
         add(scroll, BorderLayout.CENTER);
-        add(panelEliminar, BorderLayout.SOUTH);
+        add(panelBotones, BorderLayout.SOUTH);
 
-        btnAgregar.addActionListener(e -> agregarLibro());
-        btnEliminar.addActionListener(e -> eliminarLibro());
-        btnBuscar.addActionListener(e -> buscarLibro());
+        btnAgregar.addActionListener(this::agregarLibro);
+        btnBuscar.addActionListener(this::buscarLibro);
+        btnEliminar.addActionListener(this::eliminarLibro);
         btnCerrar.addActionListener(e -> dispose());
     }
 
-    private void agregarLibro() {
+    private void llenarCombosBibliotecas() {
+        comboOrigen.removeAllItems();
+        comboDestino.removeAllItems();
+
+        if (bibliotecas == null || bibliotecas.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No hay bibliotecas cargadas aún.");
+            return;
+        }
+
+        for (Biblioteca b : bibliotecas.values()) {
+            comboOrigen.addItem(b.getId() + " - " + b.getNombre());
+            comboDestino.addItem(b.getId() + " - " + b.getNombre());
+        }
+    }
+
+    private void agregarLibro(ActionEvent e) {
         try {
             String titulo = txtTitulo.getText().trim();
             String autor = txtAutor.getText().trim();
             String isbn = txtIsbn.getText().trim();
             String genero = txtGenero.getText().trim();
+            String estado = txtEstado.getText().trim();
             int anio = Integer.parseInt(txtAnio.getText().trim());
-            String idBiblio = comboBibliotecas.getSelectedItem().toString();
 
             if (titulo.isEmpty() || autor.isEmpty() || isbn.isEmpty() || genero.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Debe completar todos los campos.");
+                JOptionPane.showMessageDialog(this, "Complete todos los campos.");
                 return;
             }
 
             Libro libro = new Libro(titulo, autor, isbn, anio, genero);
-            catalogo.insertarLibroEn(idBiblio, libro);
-            areaResultado.append(" Libro agregado: " + titulo + " → " + idBiblio + "\n");
+            libro.setEstado(estado);
 
-            txtTitulo.setText("");
-            txtAutor.setText("");
-            txtIsbn.setText("");
-            txtAnio.setText("");
-            txtGenero.setText("");
+            hash.insertar(isbn, libro);
+
+            String seleccionado = (String) comboOrigen.getSelectedItem();
+            if (seleccionado == null || seleccionado.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Seleccione una biblioteca de origen.");
+                return;
+            }
+
+            String idBiblioteca = seleccionado.split(" - ")[0].trim();
+
+            Biblioteca b = bibliotecas.get(idBiblioteca);
+            if (b == null) {
+                JOptionPane.showMessageDialog(this, "Biblioteca no encontrada: " + idBiblioteca);
+                return;
+            }
+
+            b.insertarLibro(libro);
+
+            areaLog.append("Libro agregado a " + b.getNombre() + ": " + titulo + " (" + isbn + ")\n");
+
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al agregar libro: " + ex.getMessage());
         }
     }
 
-    private void buscarLibro() {
-        String texto = txtEliminar.getText().trim().toLowerCase();
-        if (texto.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Ingrese título, género, año o ISBN para buscar.");
+    private void buscarLibro(ActionEvent e) {
+        String dato = JOptionPane.showInputDialog(this, "Ingrese Título, ISBN, Género o Año:");
+        if (dato == null || dato.trim().isEmpty()) {
+            return;
+        }
+        dato = dato.trim();
+
+        Libro libro = (Libro) hash.buscar(dato);
+        if (libro != null) {
+            mostrarLibro(libro, "HashTable ISBN");
             return;
         }
 
-        areaResultado.setText("");
-        for (Biblioteca b : catalogo.getBibliotecas().values()) {
-            b.getArbolAvl().mostrarCoincidencias(texto, areaResultado);
+        for (Biblioteca b : bibliotecas.values()) {
+            Libro encontradoAVL = b.getArbolAvl().buscar(dato);
+            if (encontradoAVL != null) {
+                mostrarLibro(encontradoAVL, "Árbol AVL (" + b.getNombre() + ")");
+                return;
+            }
 
+            try {
+                int anio = Integer.parseInt(dato);
+                Libro encontradoB = b.getArbolB().buscarPorAnio(anio);
+                if (encontradoB != null) {
+                    mostrarLibro(encontradoB, "Árbol B (" + b.getNombre() + ")");
+                    return;
+                }
+            } catch (NumberFormatException ex) {
+
+            }
+
+            var listaGenero = b.getArbolBMas().buscarPorGenero(dato);
+            if (!listaGenero.isEmpty()) {
+                for (Libro l : listaGenero) {
+                    mostrarLibro(l, "Árbol B+ (" + b.getNombre() + ")");
+                }
+                return;
+            }
         }
+
+        JOptionPane.showMessageDialog(this, "No se encontró ningún libro con ese dato.");
     }
 
-    private void eliminarLibro() {
-        String texto = txtEliminar.getText().trim();
-        if (texto.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Ingrese título, género, año o ISBN para eliminar.");
+    private void eliminarLibro(java.awt.event.ActionEvent e) {
+        String dato = JOptionPane.showInputDialog(this, "Ingrese Título, ISBN, Género o Año para eliminar:");
+        if (dato == null || dato.trim().isEmpty()) {
             return;
         }
 
+        dato = dato.trim();
+        Integer anioBuscado = null;
         try {
-            if (texto.matches("\\d+")) {
-                catalogo.eliminarLibro(texto);
-            } else {
-                Object obj = catalogo.getHash().buscar(texto);
-                if (obj instanceof Libro libro) {
-                    catalogo.eliminarLibro(libro.getIsbn());
+            anioBuscado = Integer.parseInt(dato.replaceAll("\\D", ""));
+        } catch (Exception ignore) {
+        }
+
+        HashTableISBN.Nodo[] tabla = hash.getTabla();
+        java.util.List<Libro> aEliminar = new java.util.ArrayList<>();
+
+        for (int i = 0; i < hash.getTamaño(); i++) {
+            HashTableISBN.Nodo nodo = tabla[i];
+            while (nodo != null) {
+                Object val = nodo.valor;
+                if (val instanceof com.mycompany.bibliotecamagica.Arboles.Libro) {
+                    Libro l = (Libro) val;
+
+                    boolean match = false;
+                    if (l.getIsbn() != null && l.getIsbn().equalsIgnoreCase(dato)) {
+                        match = true;
+                    } else if (l.getTitulo() != null && l.getTitulo().equalsIgnoreCase(dato)) {
+                        match = true;
+                    } else if (l.getGenero() != null && l.getGenero().equalsIgnoreCase(dato)) {
+                        match = true;
+                    } else if (anioBuscado != null && l.getAnio() == anioBuscado) {
+                        match = true;
+                    }
+
+                    if (match) {
+                        aEliminar.add(l);
+                    }
+                }
+                nodo = nodo.siguiente;
+            }
+        }
+
+        if (aEliminar.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No se encontró el libro para eliminar.");
+            return;
+        }
+
+        int eliminados = 0;
+        for (Libro l : aEliminar) {
+            boolean eliminadoAlguno = false;
+
+            try {
+                if (l.getIsbn() != null) {
+                    boolean ok = hash.eliminar(l.getIsbn());
+                    eliminadoAlguno = ok || eliminadoAlguno;
+                }
+            } catch (Exception ignore) {
+            }
+
+            for (Biblioteca b : bibliotecas.values()) {
+                try {
+                    b.getArbolAvl().eliminar(l.getTitulo());
+                    eliminadoAlguno = true;
+                } catch (Exception ignore) {
+                }
+
+                try {
+                    b.getArbolB().eliminarPorAnio(l.getAnio(), l.getTitulo());
+                    eliminadoAlguno = true;
+                } catch (Exception ignore) {
+                }
+
+                try {
+
+                } catch (Exception ignore) {
                 }
             }
-            areaResultado.append("️ Libro eliminado: " + texto + "\n");
-        } catch (Exception ex) {
-            areaResultado.append("Error al eliminar: " + ex.getMessage() + "\n");
+
+            if (eliminadoAlguno) {
+                eliminados++;
+                areaLog.append("Libro eliminado: " + l.getTitulo() + " (" + l.getIsbn() + ")\n");
+            }
         }
+
+        if (eliminados == 0) {
+            JOptionPane.showMessageDialog(this, "No se pudo eliminar el libro (no se encontró en las estructuras).");
+        } else {
+            areaLog.append("--------------------------------------\n");
+        }
+    }
+
+    private void mostrarLibro(Libro l, String tipo) {
+        areaLog.append("Encontrado por " + tipo + ":\n");
+        areaLog.append("Título: " + l.getTitulo() + "\n");
+        areaLog.append("Autor: " + l.getAutor() + "\n");
+        areaLog.append("ISBN: " + l.getIsbn() + "\n");
+        areaLog.append("Género: " + l.getGenero() + "\n");
+        areaLog.append("Año: " + l.getAnio() + "\n");
+        areaLog.append("--------------------------------------\n");
     }
 
     /**
@@ -203,37 +339,6 @@ public class PanelLibros extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(PanelLibros.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(PanelLibros.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(PanelLibros.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(PanelLibros.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new PanelLibros().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables

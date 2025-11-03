@@ -9,6 +9,7 @@ package com.mycompany.bibliotecamagica.Arboles;
  * @author Ana
  */
 import java.util.ArrayList;
+import java.util.List;
 
 public class ArbolB {
 
@@ -218,4 +219,31 @@ public class ArbolB {
             }
         }
     }
+
+    public List<Libro> obtenerTodosLosLibros() {
+        List<Libro> resultado = new ArrayList<>();
+        obtenerLibrosRec(raiz, resultado);
+        return resultado;
+    }
+
+    private void obtenerLibrosRec(NodoB nodo, List<Libro> lista) {
+        if (nodo == null) {
+            return;
+        }
+
+        int i;
+        for (i = 0; i < nodo.libros.size(); i++) {
+
+            if (!nodo.hoja) {
+                obtenerLibrosRec(nodo.hijos.get(i), lista);
+            }
+
+            lista.add(nodo.libros.get(i));
+        }
+
+        if (!nodo.hoja) {
+            obtenerLibrosRec(nodo.hijos.get(i), lista);
+        }
+    }
+
 }
